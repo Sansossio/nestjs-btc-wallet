@@ -1,14 +1,33 @@
 import { Injectable } from '@nestjs/common'
-import * as Bitcore from 'bitcore-lib'
+import { RpcService } from '../../rpc/service/rpc.service'
+import { v4 as uuidv4 } from 'uuid'
+import { AvailableMethodsRpc } from '../../rpc/dto/available-methods.rpc'
+import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
+import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
 
 @Injectable()
 export class WalletService {
-  async generateNewWallet () {
-    const privateKey = new Bitcore.PrivateKey()
-    const publicKey = privateKey.toAddress().toString()
+  constructor (
+    private readonly rpcService: RpcService
+  ) {}
+
+  async generateNewWallet (): Promise<GenerateWalletResponseDto> {
+    const walletName = uuidv4()
+
     return {
-      publicKey,
-      privateKey: privateKey.toWIF()
+      walletName: (await this.rpcService.call(AvailableMethodsRpc.CREATEWALLET, [walletName])).name
+    }
+  }
+
+  async getWalletsList (): Promise<string[]> {
+    const wallets: string[] = await this.rpcService.call(AvailableMethodsRpc.LISTWALLETS)
+
+    return wallets.filter(wallet => !!wallet)
+  }
+
+  async getBalance (walletId: string): Promise<GetWalletBalanceResponseDto> {
+    return {
+      balance: await this.rpcService.call(AvailableMethodsRpc.GETBALANCE, [], `wallet/${walletId}`)
     }
   }
 }

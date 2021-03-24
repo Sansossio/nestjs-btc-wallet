@@ -1,5 +1,7 @@
-import { Controller, Post } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Controller, Get, Param, Post } from '@nestjs/common'
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
+import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
 import { WalletService } from '../service/wallet.service'
 
 @Controller('wallet')
@@ -9,10 +11,31 @@ export class WalletController {
     private readonly service: WalletService
   ) {}
 
+  @Get('list')
+  @ApiOperation({
+    summary: 'Get list of wallets'
+  })
+  @ApiOkResponse({ type: [String] })
+  getWalletsList () {
+    return this.service.getWalletsList()
+  }
+
+  @Get(':walletId/balance')
+  @ApiOperation({
+    summary: 'Get wallet balance'
+  })
+  @ApiOkResponse({ type: GetWalletBalanceResponseDto })
+  getWalletBalance (
+    @Param('walletId') walletId: string
+  ) {
+    return this.service.getBalance(walletId)
+  }
+
   @Post()
   @ApiOperation({
     summary: 'Generate a new btc wallet'
   })
+  @ApiOkResponse({ type: GenerateWalletResponseDto })
   createNewWallet () {
     return this.service.generateNewWallet()
   }
