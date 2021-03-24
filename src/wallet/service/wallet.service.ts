@@ -15,19 +15,19 @@ export class WalletService {
     const walletName = uuidv4()
 
     return {
-      walletName: (await this.rpcService.call(AvailableMethodsRpc.CREATEWALLET, [walletName])).name
+      walletName: (await this.rpcService.call<{ name: string }>(AvailableMethodsRpc.CREATEWALLET, [walletName])).name
     }
   }
 
   async getWalletsList (): Promise<string[]> {
-    const wallets: string[] = await this.rpcService.call(AvailableMethodsRpc.LISTWALLETS)
+    const wallets: string[] = await this.rpcService.call<string[]>(AvailableMethodsRpc.LISTWALLETS)
 
     return wallets.filter(wallet => !!wallet)
   }
 
   async getBalance (walletId: string): Promise<GetWalletBalanceResponseDto> {
     return {
-      balance: await this.rpcService.call(AvailableMethodsRpc.GETBALANCE, [], `wallet/${walletId}`)
+      balance: await this.rpcService.call<number>(AvailableMethodsRpc.GETBALANCE, [], `wallet/${walletId}`)
     }
   }
 }

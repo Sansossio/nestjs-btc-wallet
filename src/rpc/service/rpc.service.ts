@@ -17,7 +17,7 @@ export class RpcService {
     private readonly httpService: HttpService
   ) {}
 
-  async call (method: AvailableMethodsRpc, params: any[] = [], path: string = '') {
+  async call <T> (method: AvailableMethodsRpc, params: any[] = [], path: string = '') {
     const url = `http://${this.username}:${this.password}@${this.domain}:${this.port}/${path}`
 
     try {
@@ -32,7 +32,7 @@ export class RpcService {
           params
         }
       ).toPromise()
-      return response.result
+      return response.result as T
     } catch (error) {
       throw ErrorRpc.fromRpcResponse(error.response.data)
     }

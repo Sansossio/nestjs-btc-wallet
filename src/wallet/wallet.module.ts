@@ -7,9 +7,6 @@ import { WalletService } from './service/wallet.service'
   controllers: [
     WalletController
   ],
-  imports: [
-    RpcModule
-  ],
   providers: [
     WalletService
   ]
