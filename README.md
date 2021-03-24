@@ -3,6 +3,15 @@
 Requirements:
 - BitcoinCore RPC Server (mainnet or regnet)
 
+# Run project
+Run project:
+```sh
+yarn
+yarn start:debug # or yarn start:dev
+```
+
+OpenApi (swagger): ```http://localhost:3000/api```
+
 # Environment variables
 ```env
 RPC_DOMAIN=btc.dolarvzla.com
