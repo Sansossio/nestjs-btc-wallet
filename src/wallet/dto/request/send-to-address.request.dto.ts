@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator'
+import { Type, Transform } from 'class-transformer'
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator'
+import { SubtractFeeFromAmount } from './enum/fee.send-to-address.request.dto'
 
 export class SendToAddressRequestDto {
   @ApiProperty()
@@ -25,9 +26,11 @@ export class SendToAddressRequestDto {
   @IsOptional()
   commentTo: string = ''
 
-  @ApiPropertyOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
+  @ApiPropertyOptional({
+    enum: Object.values(SubtractFeeFromAmount),
+    example: SubtractFeeFromAmount.NO
+  })
+  @IsEnum(SubtractFeeFromAmount)
   @IsOptional()
-  subtractFeeFromAmount: boolean = false
+  subtractFeeFromAmount: SubtractFeeFromAmount
 }

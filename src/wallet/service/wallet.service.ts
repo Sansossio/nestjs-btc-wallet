@@ -7,6 +7,7 @@ import { GetWalletBalanceResponseDto } from '../dto/response/get-wallet-balance.
 import { GetWalletTransactionsResponseDto } from '../dto/response/get-wallet-transactions.response.dto'
 import { SendToAddressRequestDto } from '../dto/request/send-to-address.request.dto'
 import { SendToAddressResponseDto } from '../dto/response/send-to-address.response.dto'
+import { SubtractFeeFromAmount } from '../dto/request/enum/fee.send-to-address.request.dto'
 
 @Injectable()
 export class WalletService {
@@ -56,16 +57,27 @@ export class WalletService {
       throw new BadRequestException('Insuficient founds')
     }
 
-    await this.rpcService.call(
+    const txid = await this.rpcService.call<string>(
       AvailableMethodsRpc.SENDTOADDRESS,
-      [query.address, query.amount, query.comment, query.commentTo, query.subtractFeeFromAmount],
+      [
+        query.address,
+        query.amount,
+        query.comment,
+        query.commentTo,
+        query.subtractFeeFromAmount === SubtractFeeFromAmount.YES
+      ],
       path
     )
 
+    const transactionDetails = await this.rpcService.call<any>(AvailableMethodsRpc.GETTRANSACTION, [txid], path)
+
     return {
+      txid: transactionDetails.txid,
       newBalance: (await this.getBalance(walletId)).balance,
       address: query.address,
-      amount: query.amount,
+      amountSpent: Math.abs(transactionDetails.amount) + Math.abs(transactionDetails.fee),
+      amountReceive: Math.abs(transactionDetails.amount),
+      fee: Math.abs(transactionDetails.fee),
       status: true
     }
   }
