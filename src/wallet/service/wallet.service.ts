@@ -15,7 +15,8 @@ export class WalletService {
     const walletName = uuidv4()
 
     return {
-      walletName: (await this.rpcService.call<{ name: string }>(AvailableMethodsRpc.CREATEWALLET, [walletName])).name
+      walletName: (await this.rpcService.call<{ name: string }>(AvailableMethodsRpc.CREATEWALLET, [walletName])).name,
+      address: await this.rpcService.call<string>(AvailableMethodsRpc.GETNEWADDRESS, [], `wallet/${walletName}`)
     }
   }
 
