@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { AvailableMethodsRpc } from '../../rpc/dto/available-methods.rpc'
 import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
 import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
+import { GetWalletTransactionsResponseDto } from '../dto/get-wallet-transactions.response.dto'
 
 @Injectable()
 export class WalletService {
@@ -30,5 +31,18 @@ export class WalletService {
     return {
       balance: await this.rpcService.call<number>(AvailableMethodsRpc.GETBALANCE, [], `wallet/${walletId}`)
     }
+  }
+
+  async getTransactions (walletId: string): Promise<GetWalletTransactionsResponseDto> {
+    const path = `wallet/${walletId}`
+    const [
+      { balance },
+      result
+    ] = await Promise.all([
+      this.getBalance(walletId),
+      this.rpcService.call<any[]>(AvailableMethodsRpc.LISTTRANSACTIONS, [], path)
+    ])
+
+    return GetWalletTransactionsResponseDto.fromRpcResponse(balance, result)
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post } from '@nestjs/common'
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
 import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
+import { GetWalletTransactionsResponseDto } from '../dto/get-wallet-transactions.response.dto'
 import { WalletService } from '../service/wallet.service'
 
 @Controller('wallet')
@@ -29,6 +30,17 @@ export class WalletController {
     @Param('walletId') walletId: string
   ) {
     return this.service.getBalance(walletId)
+  }
+
+  @Get(':walletId/transactions')
+  @ApiOperation({
+    summary: 'Get wallet transactions'
+  })
+  @ApiOkResponse({ type: GetWalletTransactionsResponseDto })
+  getWalletTransactions (
+    @Param('walletId') walletId: string
+  ) {
+    return this.service.getTransactions(walletId)
   }
 
   @Post()
