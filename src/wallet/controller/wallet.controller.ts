@@ -1,8 +1,11 @@
-import { Controller, Get, Param, Post } from '@nestjs/common'
+import { Controller, Get, HttpStatus, Param, Post, Query } from '@nestjs/common'
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
-import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
-import { GetWalletTransactionsResponseDto } from '../dto/get-wallet-transactions.response.dto'
+import { ApiErrorResponse } from '../../decorators/api-error-response.decorator'
+import { SendToAddressRequestDto } from '../dto/request/send-to-address.request.dto'
+import { GenerateWalletResponseDto } from '../dto/response/generate-wallet.response.dto'
+import { GetWalletBalanceResponseDto } from '../dto/response/get-wallet-balance.response.dto'
+import { GetWalletTransactionsResponseDto } from '../dto/response/get-wallet-transactions.response.dto'
+import { SendToAddressResponseDto } from '../dto/response/send-to-address.response.dto'
 import { WalletService } from '../service/wallet.service'
 
 @Controller('wallet')
@@ -50,5 +53,20 @@ export class WalletController {
   @ApiOkResponse({ type: GenerateWalletResponseDto })
   createNewWallet () {
     return this.service.generateNewWallet()
+  }
+
+  @Post(':walletId/send')
+  @ApiOperation({
+    summary: 'Send bitcoins to address'
+  })
+  @ApiOkResponse({ type: SendToAddressResponseDto })
+  @ApiErrorResponse(
+    HttpStatus.BAD_REQUEST
+  )
+  send (
+    @Param('walletId') walletId: string,
+    @Query() query: SendToAddressRequestDto
+  ) {
+    return this.service.send(walletId, query)
   }
 }

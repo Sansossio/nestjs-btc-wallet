@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { RpcService } from '../../rpc/service/rpc.service'
 import { v4 as uuidv4 } from 'uuid'
 import { AvailableMethodsRpc } from '../../rpc/dto/available-methods.rpc'
-import { GenerateWalletResponseDto } from '../dto/generate-wallet.response.dto'
-import { GetWalletBalanceResponseDto } from '../dto/get-wallet-balance.response.dto'
-import { GetWalletTransactionsResponseDto } from '../dto/get-wallet-transactions.response.dto'
+import { GenerateWalletResponseDto } from '../dto/response/generate-wallet.response.dto'
+import { GetWalletBalanceResponseDto } from '../dto/response/get-wallet-balance.response.dto'
+import { GetWalletTransactionsResponseDto } from '../dto/response/get-wallet-transactions.response.dto'
+import { SendToAddressRequestDto } from '../dto/request/send-to-address.request.dto'
+import { SendToAddressResponseDto } from '../dto/response/send-to-address.response.dto'
 
 @Injectable()
 export class WalletService {
@@ -44,5 +46,27 @@ export class WalletService {
     ])
 
     return GetWalletTransactionsResponseDto.fromRpcResponse(balance, result)
+  }
+
+  async send (walletId: string, query: SendToAddressRequestDto): Promise<SendToAddressResponseDto> {
+    const path = `wallet/${walletId}`
+    const { balance } = await this.getBalance(walletId)
+
+    if (query.amount > balance) {
+      throw new BadRequestException('Insuficient founds')
+    }
+
+    await this.rpcService.call(
+      AvailableMethodsRpc.SENDTOADDRESS,
+      [query.address, query.amount, query.comment, query.commentTo, query.subtractFeeFromAmount],
+      path
+    )
+
+    return {
+      newBalance: (await this.getBalance(walletId)).balance,
+      address: query.address,
+      amount: query.amount,
+      status: true
+    }
   }
 }

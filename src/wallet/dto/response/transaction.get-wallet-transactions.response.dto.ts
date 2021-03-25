@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
-import { TransactionTypeEnum } from './enum/transaction-type.enum'
+import { TransactionTypeEnum } from '../enum/transaction-type.enum'
 
 export class TransactionGetWalletTransactionsResponseDto {
   @ApiProperty({ enum: TransactionTypeEnum })
