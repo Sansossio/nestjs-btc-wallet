@@ -9,7 +9,7 @@ for k in $(jq '.[]' $FILENAME); do
         fi
         walletName=${k%\"}
         walletName=${walletName#\"}
-        folder="$(pwd)/backups/$(date +%s)/$walletName"
+        folder="$(pwd)/backups/$(date +%s)"
         filename="$folder/$walletName.dump"
 
         mkdir -p $folder
