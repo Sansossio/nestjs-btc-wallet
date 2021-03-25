@@ -7,9 +7,9 @@ for k in $(jq '.[]' $FILENAME); do
         if [ "$k" == \"\" ]; then
                 continue
         fi
-        folder="$(pwd)/backups/$(date +%s)/$k"
         walletName=${k%\"}
         walletName=${walletName#\"}
+        folder="$(pwd)/backups/$(date +%s)/$walletName"
         filename="$folder/$walletName.dump"
 
         mkdir -p $folder
